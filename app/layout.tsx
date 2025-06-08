@@ -5,7 +5,13 @@ import { ThemeProvider } from "@/components/theme-provider"
 export const metadata = {
   title: "Harish Sivaram | Cybersecurity Portfolio",
   description: "Personal portfolio of Harish Sivaram, Cybersecurity and Threat Intelligence professional",
-    generator: ''
+    generator: 'v0.dev'
+}
+
+// Add Google Fonts
+const playfair = {
+  variable: "--font-playfair",
+  display: "swap",
 }
 
 export default function RootLayout({

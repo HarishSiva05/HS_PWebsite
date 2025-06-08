@@ -19,7 +19,6 @@ import {
   Leaf,
   Phone,
   ChevronDown,
-  ExternalLink,
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,7 +30,6 @@ import TerminalText from "@/components/terminal-text"
 import AnimatedCounter from "@/components/animated-counter"
 import AnimatedBackground from "@/components/animated-background"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -56,7 +54,7 @@ export default function Home() {
   const certificationsInView = useInView(certificationsRef, { amount: 0.5 })
   const contactInView = useInView(contactRef, { amount: 0.5 })
 
-  // Projects data
+  // Projects data - updated with new project
   const projects = [
     {
       id: 1,
@@ -68,13 +66,28 @@ export default function Home() {
       image: "/placeholder.svg?height=400&width=600",
       tags: ["Python", "AI/ML", "Security", "NLP"],
       category: "security",
-      github: "https://github.com/Harish-Sivaram/security-chatbot",
+      github: "https://youtu.be/zY5ZpLVGGFg",
       demo: "#",
       icon: <MessageSquare className="h-6 w-6" />,
       technologies: ["Python", "TensorFlow", "Natural Language Processing", "Flask"],
     },
     {
       id: 2,
+      title: "APT Malware Classification",
+      description:
+        "Conducted malware analysis on samples from 43 APT Groups using Ghidra to extract opcodes, and trained ML models to distinguish APT group patterns based on opcode sequences.",
+      longDescription:
+        "This advanced cybersecurity project involved comprehensive malware analysis of samples from 43 different Advanced Persistent Threat (APT) groups. Using Ghidra, a powerful reverse engineering tool, I extracted opcode sequences from malware samples to create unique fingerprints for each APT group. The project utilized machine learning algorithms to identify patterns and classify malware based on their opcode signatures. This approach enables security analysts to quickly attribute new malware samples to specific threat actors, improving incident response and threat intelligence capabilities. The classification model achieved high accuracy in distinguishing between different APT groups, making it a valuable tool for cybersecurity professionals.",
+      image: "/placeholder.svg?height=400&width=600",
+      tags: ["Malware Analysis", "Machine Learning", "Ghidra", "APT", "Cybersecurity"],
+      category: "security",
+      github: "https://github.com/HarishSiva05/APT-Malware-Classification",
+      demo: "#",
+      icon: <Shield className="h-6 w-6" />,
+      technologies: ["Ghidra", "Python", "Scikit-learn", "Reverse Engineering", "Threat Intelligence"],
+    },
+    {
+      id: 3,
       title: "EthChat",
       description:
         "A decentralized messaging application hosted on the Ethereum Blockchain that allows you to send and receive encrypted messages via smart contract.",
@@ -83,13 +96,13 @@ export default function Home() {
       image: "/placeholder.svg?height=400&width=600",
       tags: ["Blockchain", "Ethereum", "Encryption", "Web3"],
       category: "blockchain",
-      github: "https://github.com/Harish-Sivaram/ethchat",
+      github: "https://github.com/HarishSiva05/Blockchain-Chat",
       demo: "#",
       icon: <Lock className="h-6 w-6" />,
       technologies: ["Solidity", "React", "Web3.js", "IPFS"],
     },
     {
-      id: 3,
+      id: 4,
       title: "Peer-Peer Energy Trading System",
       description:
         "Blockchain revolutionizes residential energy trading, enabling direct peer-to-peer transactions and maximizing benefits. Secure, automated, and sustainable.",
@@ -104,7 +117,7 @@ export default function Home() {
       technologies: ["Ethereum", "IoT", "Smart Contracts", "React"],
     },
     {
-      id: 4,
+      id: 5,
       title: "Agrimate",
       description:
         "Wholesome application developed to enhance the financial capabilities of farmers, providing tools for financial management and market access.",
@@ -113,7 +126,7 @@ export default function Home() {
       image: "/placeholder.svg?height=400&width=600",
       tags: ["FinTech", "Agriculture", "Mobile App", "Financial Inclusion"],
       category: "fintech",
-      github: "https://github.com/Harish-Sivaram/agrimate",
+      github: "https://github.com/HarishSiva05/Agrimate-YUGAM",
       demo: "#",
       icon: <Leaf className="h-6 w-6" />,
       technologies: ["React Native", "Node.js", "MongoDB", "Financial APIs"],
@@ -156,14 +169,7 @@ export default function Home() {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <motion.div
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            {/* <Shield className="h-6 w-6 text-emerald-500" />
-            <span className="font-bold text-lg">Harish Sivaram</span> */}
-          </motion.div>
+          <div></div>
 
           <div className="hidden md:flex items-center gap-6">
             {[
@@ -212,19 +218,15 @@ export default function Home() {
 
         <div className="container px-4 md:px-6 relative z-10">
           <div className="max-w-3xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <Badge className="mb-4 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors">
-                Cybersecurity Professional
-              </Badge>
-            </motion.div>
-
             <motion.h1
               className="text-4xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <span className="block">Harish Sivaram</span>
+              <span className="block tracking-wide bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent font-sans font-semibold">
+                Harish Sivaram
+              </span>
             </motion.h1>
 
             <motion.div
@@ -235,10 +237,11 @@ export default function Home() {
             >
               <TerminalText
                 texts={[
-                  "Cybersecurity Specialist",
+                  "Cybersecurity Student",
                   "Full-Stack Developer",
                   "Blockchain Enthusiast",
                   "AI/ML Practitioner",
+                  "iOS Developer",
                 ]}
               />
             </motion.div>
@@ -250,7 +253,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               Master's student in Cybersecurity and Threat Intelligence with expertise in enterprise content management,
-              blockchain technologies, and AI-driven security solutions.
+              blockchain technologies, AI-driven security solutions, and iOS development.
             </motion.p>
 
             <motion.div
@@ -307,7 +310,7 @@ export default function Home() {
                 <span className="sr-only">LinkedIn</span>
               </motion.a>
               <motion.a
-                href="mailto:harish.greenecm@gmail.com"
+                href="mailto:harish.portfolio05@gmail.com"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.2, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
@@ -354,7 +357,7 @@ export default function Home() {
               className="space-y-2"
             >
               <h3 className="text-4xl font-bold text-emerald-500">
-                <AnimatedCounter from={0} to={4} duration={2} />+
+                <AnimatedCounter from={0} to={5} duration={2} />+
               </h3>
               <p className="text-muted-foreground">Certifications</p>
             </motion.div>
@@ -366,7 +369,7 @@ export default function Home() {
               className="space-y-2"
             >
               <h3 className="text-4xl font-bold text-emerald-500">
-                <AnimatedCounter from={0} to={4} duration={2} />+
+                <AnimatedCounter from={0} to={5} duration={2} />+
               </h3>
               <p className="text-muted-foreground">Major Projects</p>
             </motion.div>
@@ -426,7 +429,7 @@ export default function Home() {
                   <p className="text-muted-foreground">University of Guelph • Sep 2024 - Present</p>
                   <p className="text-sm text-muted-foreground mt-2">
                     Courses: Cybersecurity and Defense, Threat Intelligence, Privacy Compliance, Penetration Testing,
-                    Digital Forensic
+                    Digital Forensic, Threat Hunting
                   </p>
                 </motion.div>
                 <motion.div
@@ -439,7 +442,7 @@ export default function Home() {
                   <p className="text-muted-foreground">
                     Sri Krishna College of Engineering and Technology • Aug 2019 - May 2023
                   </p>
-                  <p className="text-sm text-muted-foreground mt-2">GPA: 9.11</p>
+                  <p className="text-sm text-muted-foreground mt-2">GPA: 9.11/10</p>
                 </motion.div>
               </div>
             </motion.div>
@@ -587,8 +590,8 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, delay: 0.1 }}
                       >
-                        Developed custom C# scripts for Laserfiche to automate repository tasks such as metadata
-                        extraction and logging.
+                        <strong>Enterprise Content Management Solutions:</strong> Developed custom C# scripts for
+                        Laserfiche to automate repository tasks such as metadata extraction and logging.
                       </motion.li>
                       <motion.li
                         initial={{ opacity: 0, x: -10 }}
@@ -596,8 +599,8 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, delay: 0.2 }}
                       >
-                        Built a Retrieval-Augmented Generation model for Laserfiche guides, enhancing knowledge
-                        management and document search capabilities.
+                        <strong>Built a RAG Model:</strong> Built a Retrieval-Augmented Generation model for Laserfiche
+                        guides, enhancing knowledge management and document search capabilities.
                       </motion.li>
                       <motion.li
                         initial={{ opacity: 0, x: -10 }}
@@ -605,8 +608,9 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, delay: 0.3 }}
                       >
-                        Gained proficiency in ClickUp, leveraging it for project management, task tracking, and
-                        collaboration across teams.
+                        <strong>Architected DoqFlowAI:</strong> Designed and implemented an intelligent workflow
+                        analysis platform that leverages AI to enhance Laserfiche document processing through automated
+                        workflow optimization and generation.
                       </motion.li>
                     </ul>
                   </div>
@@ -646,7 +650,8 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, delay: 0.1 }}
                       >
-                        Developed responsive websites with a focus on user-friendly UI/UX design.
+                        <strong>Web Development and UI/UX Design:</strong> Developed responsive websites with a focus on
+                        user-friendly UI/UX design.
                       </motion.li>
                       <motion.li
                         initial={{ opacity: 0, x: -10 }}
@@ -654,8 +659,8 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, delay: 0.2 }}
                       >
-                        Installed, configured, and maintained IBM FileNet P8 systems to ensure efficient enterprise
-                        content management workflows.
+                        <strong>IBM FileNet P8 Administration:</strong> Installed, configured, and maintained IBM
+                        FileNet P8 systems to ensure efficient enterprise content management workflows.
                       </motion.li>
                     </ul>
                   </div>
@@ -770,7 +775,7 @@ export default function Home() {
                   {
                     title: "Criminal Justice Information Services Security and Privacy Training",
                     issuer: "CJIS",
-                    date: "2023",
+                    date: "2023 (Expired)",
                     icon: <Shield className="h-5 w-5" />,
                   },
                   {
@@ -778,6 +783,12 @@ export default function Home() {
                     issuer: "CISCO",
                     date: "2022",
                     icon: <Lock className="h-5 w-5" />,
+                  },
+                  {
+                    title: "Rapid Incident Response with Cisco XDR",
+                    issuer: "CISCO",
+                    date: "2024",
+                    icon: <Shield className="h-5 w-5" />,
                   },
                 ].map((cert, index) => (
                   <motion.div
@@ -849,6 +860,20 @@ export default function Home() {
                   <h4 className="font-semibold text-lg">Participation</h4>
                   <p className="text-muted-foreground">HackHarvard, HackAlphaX, MLH</p>
                 </motion.div>
+                <motion.div
+                  className="border-l-2 border-muted pl-6 relative"
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="absolute w-3 h-3 bg-muted rounded-full -left-[7px] top-1.5"></div>
+                  <h4 className="font-semibold text-lg">Additional Skills</h4>
+                  <p className="text-muted-foreground">iOS Developer - 2 ongoing projects</p>
+                  <p className="text-muted-foreground">Partially Proficient Video Editor</p>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -893,8 +918,19 @@ export default function Home() {
                       </div>
                       <div>
                         <h4 className="font-medium">Email</h4>
-                        <p className="text-muted-foreground">harish.greenecm@gmail.com</p>
-                        <p className="text-muted-foreground">sivaramh@uoguelph.ca</p>
+                        <a
+                          href="mailto:harish.portfolio05@gmail.com"
+                          className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                        >
+                          harish.portfolio05@gmail.com
+                        </a>
+                        <br />
+                        <a
+                          href="mailto:sivaramh@uoguelph.ca"
+                          className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                        >
+                          sivaramh@uoguelph.ca
+                        </a>
                       </div>
                     </motion.div>
                     <motion.div
@@ -907,7 +943,12 @@ export default function Home() {
                       </div>
                       <div>
                         <h4 className="font-medium">Phone</h4>
-                        <p className="text-muted-foreground">+1 (647)-671-3863</p>
+                        <a
+                          href="tel:+16476713863"
+                          className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                        >
+                          +1 (647)-671-3863
+                        </a>
                       </div>
                     </motion.div>
                     <motion.div
@@ -954,11 +995,14 @@ export default function Home() {
                   <div className="mt-8 pt-6 border-t border-border">
                     <p className="text-muted-foreground">
                       I'm currently open to research collaborations, internship opportunities, and projects in
-                      cybersecurity and blockchain domains.
+                      cybersecurity and blockchain domains. I also have 2 ongoing iOS development projects.
                     </p>
                     <div className="flex justify-center mt-6">
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2">
+                        <Button
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2"
+                          onClick={() => window.open("mailto:harish.portfolio05@gmail.com", "_blank")}
+                        >
                           <Mail className="mr-2 h-4 w-4" />
                           Email Me
                         </Button>
@@ -976,10 +1020,6 @@ export default function Home() {
       <footer className="border-t border-muted/20 py-8 md:py-12">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-emerald-500" />
-              <span className="text-lg font-medium">Harish Sivaram • Cybersecurity Portfolio</span>
-            </div>
             <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} All rights reserved.</p>
             <div className="flex gap-6">
               <motion.a
@@ -1005,7 +1045,7 @@ export default function Home() {
                 <span className="sr-only">LinkedIn</span>
               </motion.a>
               <motion.a
-                href="mailto:harish.greenecm@gmail.com"
+                href="mailto:harish.portfolio05@gmail.com"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
@@ -1033,19 +1073,6 @@ export default function Home() {
 
           {selectedProject !== null && (
             <div className="space-y-6 mt-4">
-              <div className="relative aspect-video rounded-lg overflow-hidden">
-                <Image
-                  src={projects.find((p) => p.id === selectedProject)?.image || "/placeholder.svg"}
-                  alt={projects.find((p) => p.id === selectedProject)?.title || ""}
-                  width={800}
-                  height={450}
-                  className="object-cover"
-                />
-                <div className="absolute top-4 right-4 bg-emerald-500/90 p-3 rounded-full">
-                  {projects.find((p) => p.id === selectedProject)?.icon}
-                </div>
-              </div>
-
               <div className="flex flex-wrap gap-2 mb-4">
                 {projects
                   .find((p) => p.id === selectedProject)
@@ -1084,17 +1111,6 @@ export default function Home() {
                     >
                       <Github className="mr-2 h-4 w-4" />
                       View Source
-                    </a>
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <a
-                      href={projects.find((p) => p.id === selectedProject)?.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center"
-                    >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Live Demo
                     </a>
                   </Button>
                 </div>
