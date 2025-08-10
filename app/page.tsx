@@ -2,25 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { motion, useScroll, useTransform, useInView } from "framer-motion"
-import {
-  Shield,
-  Code,
-  Github,
-  Linkedin,
-  Mail,
-  ChevronRight,
-  Briefcase,
-  GraduationCap,
-  Award,
-  FileText,
-  Lock,
-  Zap,
-  MessageSquare,
-  Leaf,
-  Phone,
-  ChevronDown,
-  X,
-} from "lucide-react"
+import { Shield, Code, Github, Linkedin, Mail, ChevronRight, Briefcase, GraduationCap, Award, FileText, Lock, Zap, MessageSquare, Leaf, Phone, ChevronDown, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +12,7 @@ import TerminalText from "@/components/terminal-text"
 import AnimatedCounter from "@/components/animated-counter"
 import AnimatedBackground from "@/components/animated-background"
 import { cn } from "@/lib/utils"
+import * as gtag from "@/lib/gtag"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -133,14 +116,63 @@ export default function Home() {
     },
   ]
 
+  // Track section views
+  const trackSectionView = (section: string) => {
+    gtag.event({
+      action: "section_view",
+      category: "engagement",
+      label: section,
+    })
+  }
+
+  // Track project interactions
+  const trackProjectView = (projectTitle: string) => {
+    gtag.event({
+      action: "project_view",
+      category: "engagement",
+      label: projectTitle,
+    })
+  }
+
+  // Track external link clicks
+  const trackExternalLink = (linkType: string, url: string) => {
+    gtag.event({
+      action: "external_link_click",
+      category: "engagement",
+      label: `${linkType}: ${url}`,
+    })
+  }
+
+  // Track contact interactions
+  const trackContactInteraction = (method: string) => {
+    gtag.event({
+      action: "contact_interaction",
+      category: "engagement",
+      label: method,
+    })
+  }
+
   // Update active section based on scroll position
   useEffect(() => {
-    if (homeInView) setActiveSection("home")
-    else if (aboutInView) setActiveSection("about")
-    else if (experienceInView) setActiveSection("experience")
-    else if (projectsInView) setActiveSection("projects")
-    else if (certificationsInView) setActiveSection("certifications")
-    else if (contactInView) setActiveSection("contact")
+    if (homeInView) {
+      setActiveSection("home")
+      trackSectionView("home")
+    } else if (aboutInView) {
+      setActiveSection("about")
+      trackSectionView("about")
+    } else if (experienceInView) {
+      setActiveSection("experience")
+      trackSectionView("experience")
+    } else if (projectsInView) {
+      setActiveSection("projects")
+      trackSectionView("projects")
+    } else if (certificationsInView) {
+      setActiveSection("certifications")
+      trackSectionView("certifications")
+    } else if (contactInView) {
+      setActiveSection("contact")
+      trackSectionView("contact")
+    }
   }, [homeInView, aboutInView, experienceInView, projectsInView, certificationsInView, contactInView])
 
   // Scroll to section
@@ -148,6 +180,11 @@ export default function Home() {
     const section = document.getElementById(sectionId)
     if (section) {
       section.scrollIntoView({ behavior: "smooth" })
+      gtag.event({
+        action: "navigation_click",
+        category: "engagement",
+        label: sectionId,
+      })
     }
   }
 
@@ -294,6 +331,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.2, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackExternalLink("GitHub", "https://github.com/Harish-Sivaram")}
               >
                 <Github className="h-6 w-6" />
                 <span className="sr-only">GitHub</span>
@@ -305,6 +343,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.2, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackExternalLink("LinkedIn", "https://www.linkedin.com/in/harish-sivaram/")}
               >
                 <Linkedin className="h-6 w-6" />
                 <span className="sr-only">LinkedIn</span>
@@ -314,6 +353,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.2, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackContactInteraction("Email")}
               >
                 <Mail className="h-6 w-6" />
                 <span className="sr-only">Email</span>
@@ -707,7 +747,10 @@ export default function Home() {
                 transition={{ duration: 0.5 }}
                 whileHover={{ y: -5 }}
                 className="bg-background/50 backdrop-blur-sm border border-muted rounded-lg overflow-hidden cursor-pointer"
-                onClick={() => setSelectedProject(project.id)}
+                onClick={() => {
+                  setSelectedProject(project.id)
+                  trackProjectView(project.title)
+                }}
               >
                 <div className="p-5">
                   <div className="flex items-start gap-3 mb-3">
@@ -921,6 +964,7 @@ export default function Home() {
                         <a
                           href="mailto:harish.portfolio05@gmail.com"
                           className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                          onClick={() => trackContactInteraction("Email - Personal")}
                         >
                           harish.portfolio05@gmail.com
                         </a>
@@ -928,6 +972,7 @@ export default function Home() {
                         <a
                           href="mailto:sivaramh@uoguelph.ca"
                           className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                          onClick={() => trackContactInteraction("Email - University")}
                         >
                           sivaramh@uoguelph.ca
                         </a>
@@ -946,6 +991,7 @@ export default function Home() {
                         <a
                           href="tel:+16476713863"
                           className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                          onClick={() => trackContactInteraction("Phone")}
                         >
                           +1 (647)-671-3863
                         </a>
@@ -966,6 +1012,7 @@ export default function Home() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                          onClick={() => trackExternalLink("LinkedIn", "https://www.linkedin.com/in/harish-sivaram/")}
                         >
                           linkedin.com/in/harish-sivaram
                         </a>
@@ -986,6 +1033,7 @@ export default function Home() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                          onClick={() => trackExternalLink("GitHub", "https://github.com/Harish-Sivaram")}
                         >
                           github.com/Harish-Sivaram
                         </a>
@@ -1001,7 +1049,10 @@ export default function Home() {
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
                           className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2"
-                          onClick={() => window.open("mailto:harish.portfolio05@gmail.com", "_blank")}
+                          onClick={() => {
+                            window.open("mailto:harish.portfolio05@gmail.com", "_blank")
+                            trackContactInteraction("Email Button")
+                          }}
                         >
                           <Mail className="mr-2 h-4 w-4" />
                           Email Me
@@ -1029,6 +1080,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackExternalLink("GitHub Footer", "https://github.com/Harish-Sivaram")}
               >
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
@@ -1040,6 +1092,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackExternalLink("LinkedIn Footer", "https://www.linkedin.com/in/harish-sivaram/")}
               >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
@@ -1049,6 +1102,7 @@ export default function Home() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => trackContactInteraction("Email Footer")}
               >
                 <Mail className="h-5 w-5" />
                 <span className="sr-only">Email</span>
@@ -1108,6 +1162,12 @@ export default function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center"
+                      onClick={() =>
+                        trackExternalLink(
+                          "Project GitHub",
+                          projects.find((p) => p.id === selectedProject)?.github || "",
+                        )
+                      }
                     >
                       <Github className="mr-2 h-4 w-4" />
                       View Source

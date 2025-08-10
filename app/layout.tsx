@@ -1,11 +1,12 @@
 import type React from "react"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import Analytics from "@/components/analytics"
+import { Suspense } from "react"
 
 export const metadata = {
   title: "Harish Sivaram | Cybersecurity Portfolio",
   description: "Personal portfolio of Harish Sivaram, Cybersecurity and Threat Intelligence professional",
-    generator: 'v0.dev'
 }
 
 // Add Google Fonts
@@ -23,7 +24,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <Suspense fallback={null}>
+            {children}
+            <Analytics />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
