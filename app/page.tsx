@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion } from "framer-motion"
 import * as gtag from "@/lib/gtag"
+import { HeroVideo3D } from "@/components/hero-video-3d"
 
 // ============ DATA ============
 const PORTFOLIO = {
@@ -509,8 +510,6 @@ function Nav({ active, onJump }: { active: string; onJump: (id: string) => void 
 
 function Hero({ onJump }: { onJump: (id: string) => void }) {
   const [roleIdx, setRoleIdx] = useState(0)
-  const { scrollY } = useScroll()
-  const portraitY = useTransform(scrollY, [0, 700], [0, 130])
 
   useEffect(() => {
     const id = setInterval(() => setRoleIdx((i) => (i + 1) % PORTFOLIO.roles.length), 2200)
@@ -519,14 +518,8 @@ function Hero({ onJump }: { onJump: (id: string) => void }) {
 
   return (
     <section id="intro" className="hero">
-      {/* Full-bleed portrait with scroll parallax */}
-      <motion.img
-        src="/portrait.png"
-        alt=""
-        aria-hidden="true"
-        className="hero-bg-portrait"
-        style={{ y: portraitY }}
-      />
+      {/* WebGL hero background: video as VideoTexture on a 3D plane */}
+      <HeroVideo3D />
       <div className="hero-bg-overlay" />
 
       <div className="hero-grid">
