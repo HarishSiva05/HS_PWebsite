@@ -524,13 +524,25 @@ function Hero({ onJump }: { onJump: (id: string) => void }) {
 
       <div className="hero-grid">
         <div className="hero-meta">
-          <Mono className="hero-tag">
-            <span className="dot-blink" style={{ background: ACCENT }} />
-            PORTFOLIO / 2026
-          </Mono>
-          <Mono>
-            {PORTFOLIO.basedSince} · {PORTFOLIO.location}
-          </Mono>
+          <video
+            className="hero-avatar-mobile"
+            src="/hero-bg.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+          />
+          <div className="hero-meta-text">
+            <Mono className="hero-tag">
+              <span className="dot-blink" style={{ background: ACCENT }} />
+              PORTFOLIO / 2026
+            </Mono>
+            <Mono>
+              {PORTFOLIO.basedSince} · {PORTFOLIO.location}
+            </Mono>
+          </div>
         </div>
 
         <h1 className="hero-title">

@@ -91,6 +91,9 @@ export function HeroVideo3D() {
     const container = containerRef.current
     if (!container) return
 
+    // Skip WebGL on mobile — the mobile hero uses a plain <video> avatar instead
+    if (window.matchMedia("(max-width: 600px)").matches) return
+
     let width = container.clientWidth
     let height = container.clientHeight
     if (width === 0 || height === 0) return
