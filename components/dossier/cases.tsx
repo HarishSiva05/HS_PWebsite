@@ -1,162 +1,48 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useRef } from "react"
+import { AnimatePresence, MotionConfig, motion } from "framer-motion"
 import { dossier, useDossier } from "./store"
 import { lockScroll } from "./smooth-scroll"
-import { PenNote, Redact, Reveal, SectionHead, Stamp } from "./primitives"
-import { CASES, CASE_FILTERS, sectionName, type CaseFile } from "@/lib/dossier"
-import * as gtag from "@/lib/gtag"
+import { Redact, SectionHead, Stamp } from "./primitives"
+import ExhibitFrame from "./exhibits/frame"
+import { CasePile } from "./cases-pile"
+import { CasesLedger } from "./cases-ledger"
+import { trackLink } from "./cases-shared"
+import { CASES, sectionName } from "@/lib/dossier"
+import { play } from "@/lib/sound"
+import "@/styles/cases.css"
 
-type Filter = (typeof CASE_FILTERS)[number]["id"]
-
-const matches = (c: CaseFile, f: Filter) => f === "all" || c.filters.includes(f)
-
-function openCase(c: CaseFile) {
-  dossier.openCase(c.id)
-  gtag.event({ action: "project_view", category: "engagement", label: c.title })
-}
-
-function FolderCard({ c, out }: { c: CaseFile; out: boolean }) {
-  return (
-    <article className={`folder-card ${out ? "is-out" : ""}`}>
-      <div className="fc-paper" aria-hidden="true">
-        <span className="mono">Brief — Case {c.no}</span>
-        <p>{c.brief}</p>
-        <span className="fc-paper-lines" />
-      </div>
-      <div className="fc-body">
-        <span className="fc-tab mono">Case {c.no}</span>
-        <div className="fc-top mono">
-          <span>{c.class}</span>
-          <span>{c.year}</span>
-        </div>
-        <h3 className="fc-title">{c.title}</h3>
-        <p className="fc-abstract">{c.abstract}</p>
-        <ul className="chips">
-          {c.stack.slice(0, 4).map((s) => (
-            <li key={s} className="chip mono">
-              {s}
-            </li>
-          ))}
-        </ul>
-        {c.metrics && (
-          <dl className="fc-metrics">
-            {c.metrics.map((m) => (
-              <div key={m.l} className="fc-metric">
-                <dt className="mono">{m.l}</dt>
-                <dd>
-                  {m.v.replace(/\+$/, "")}
-                  {m.v.endsWith("+") && <em>+</em>}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-        <button className="fc-open mono" onClick={() => openCase(c)} data-cursor="Open file">
-          Open file <span aria-hidden="true">→</span>
-        </button>
-        <Stamp tone={c.status === "In Review" ? "ink" : "red"} rotate={-11} className="fc-stamp" delay={0.15}>
-          {c.status}
-        </Stamp>
-        {c.note && (
-          <PenNote arrow="up" arrowFirst rotate={-4} className="fc-note">
-            {c.note}
-          </PenNote>
-        )}
-      </div>
-    </article>
-  )
-}
+const FEATURED = CASES.filter((c) => c.featured)
+const REST = CASES.filter((c) => !c.featured)
 
 export function Cases() {
-  const [filter, setFilter] = useState<Filter>("all")
-  const featured = CASES.filter((c) => c.featured)
-  const rest = CASES.filter((c) => !c.featured)
-  const shown = rest.filter((c) => matches(c, filter))
-
   return (
     <section id="cases" className="page cases-sec" aria-label={sectionName("cases")}>
-      <SectionHead
-        id="cases"
-        title={
-          <>
-            Seven files.{" "}
-            <Redact block delay={120}>
-              All open.
-            </Redact>
-          </>
-        }
-        kicker="From APT attribution to an iPhone app in App Store review. Open any file for the brief, the method and the evidence."
-      />
-
-      <div className="filters" role="toolbar" aria-label="Filter projects">
-        {CASE_FILTERS.map((f) => {
-          const n = CASES.filter((c) => matches(c, f.id)).length
-          return (
-            <button
-              key={f.id}
-              className={`filter ${filter === f.id ? "is-on" : ""}`}
-              onClick={() => setFilter(f.id)}
-              aria-pressed={filter === f.id}
-            >
-              {f.label} <span className="mono">{String(n).padStart(2, "0")}</span>
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="featured">
-        {featured.map((c, i) => (
-          <Reveal key={c.id} delay={i * 0.1}>
-            <FolderCard c={c} out={!matches(c, filter)} />
-          </Reveal>
-        ))}
-      </div>
-
-      <div className="ledger">
-        <div className="ledger-head mono" aria-hidden="true">
-          <span>No.</span>
-          <span>Subject</span>
-          <span className="hide-md">Methods</span>
-          <span>Year</span>
-          <span>Status</span>
-        </div>
-        <motion.ul layout>
-          <AnimatePresence initial={false}>
-            {shown.map((c) => (
-              <motion.li
-                key={c.id}
-                layout
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
-              >
-                <button className="ledger-row" onClick={() => openCase(c)} data-cursor="Open file">
-                  <span className="mono ledger-no">{c.no}</span>
-                  <span className="ledger-main">
-                    <strong>{c.title}</strong>
-                    <span className="mono">{c.class}</span>
-                  </span>
-                  <span className="ledger-stack hide-md">{c.stack.slice(0, 3).join(" · ")}</span>
-                  <span className="mono ledger-year">{c.year}</span>
-                  <span className="ledger-status mono">{c.status}</span>
-                  <span className="ledger-arrow" aria-hidden="true">
-                    ↗
-                  </span>
-                </button>
-              </motion.li>
-            ))}
-          </AnimatePresence>
-        </motion.ul>
-        {shown.length === 0 && <p className="ledger-empty mono">No further files in this category.</p>}
-      </div>
+      {/* framer-motion honours prefers-reduced-motion inside this section (stamps, pen notes) */}
+      <MotionConfig reducedMotion="user">
+        <SectionHead
+          id="cases"
+          title={
+            <>
+              Seven files.{" "}
+              <Redact block delay={120}>
+                All open.
+              </Redact>
+            </>
+          }
+          kicker="From APT attribution to an iPhone app in App Store review. Every file comes with its exhibit, labelled for what it is: real data, real footage, a simulation or an illustration."
+        />
+        <CasePile cases={FEATURED} />
+        <CasesLedger cases={REST} />
+      </MotionConfig>
     </section>
   )
 }
 
 // ============ CASE DRAWER ============
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
 
 export function CaseDrawer() {
   const openId = useDossier((s) => s.openCase)
@@ -168,23 +54,30 @@ export function CaseDrawer() {
   useEffect(() => {
     if (!c) return
     if (!returnTo.current) returnTo.current = document.activeElement as HTMLElement
+    else play("tick")
     lockScroll(true)
     sheet.current?.scrollTo({ top: 0 })
     sheet.current?.querySelector<HTMLElement>(".drawer-close")?.focus({ preventScroll: true })
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dossier.closeCase()
-      if (e.key === "ArrowRight") dossier.openCase(CASES[(idx + 1) % CASES.length].id)
-      if (e.key === "ArrowLeft") dossier.openCase(CASES[(idx - 1 + CASES.length) % CASES.length].id)
+      if (e.key === "Escape") return dossier.closeCase()
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        // leave arrows alone when an exhibit or a form control is using them
+        const t = e.target as HTMLElement | null
+        if (e.defaultPrevented || t?.closest("input, textarea, select, [contenteditable='true'], [role='slider']")) return
+        const step = e.key === "ArrowRight" ? 1 : -1
+        dossier.openCase(CASES[(idx + step + CASES.length) % CASES.length].id)
+      }
       if (e.key === "Tab" && sheet.current) {
-        const f = sheet.current.querySelectorAll<HTMLElement>("a[href], button")
+        const f = Array.from(sheet.current.querySelectorAll<HTMLElement>(FOCUSABLE))
         if (!f.length) return
         const first = f[0]
         const last = f[f.length - 1]
-        if (e.shiftKey && document.activeElement === first) {
+        const inside = sheet.current.contains(document.activeElement)
+        if (e.shiftKey && (document.activeElement === first || !inside)) {
           e.preventDefault()
           last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
+        } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
           e.preventDefault()
           first.focus()
         }
@@ -269,6 +162,10 @@ export function CaseDrawer() {
                   </dl>
                 </header>
 
+                <div className="drawer-exhibit">
+                  <ExhibitFrame caseId={c.id} overlay />
+                </div>
+
                 <section className="drawer-part">
                   <h3 className="mono">01 — Brief</h3>
                   <p className="drawer-brief">{c.brief}</p>
@@ -310,14 +207,7 @@ export function CaseDrawer() {
                     <ul className="drawer-links">
                       {c.links.map((l) => (
                         <li key={l.href}>
-                          <a
-                            href={l.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() =>
-                              gtag.event({ action: "external_link_click", category: "engagement", label: `${c.title}: ${l.label}` })
-                            }
-                          >
+                          <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={() => trackLink(c, l.label)}>
                             {l.label} <span aria-hidden="true">↗</span>
                           </a>
                         </li>

@@ -40,9 +40,13 @@ function DeclassifiedStamp() {
 
   useEffect(() => {
     if (!complete) return
-    setStamp(true)
-    const t = setTimeout(() => setStamp(false), 2800)
-    return () => clearTimeout(t)
+    // wait for the last redaction bar to finish lifting (~1 s) before stamping
+    const show = setTimeout(() => setStamp(true), 1100)
+    const hide = setTimeout(() => setStamp(false), 1100 + 2800)
+    return () => {
+      clearTimeout(show)
+      clearTimeout(hide)
+    }
   }, [complete])
 
   return (

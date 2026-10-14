@@ -28,7 +28,7 @@ export type Section = {
 export const SECTIONS: Section[] = [
   { id: "cover", no: "00", label: "Home", page: 1 },
   { id: "summary", no: "01", label: "Summary", page: 2 },
-  { id: "capabilities", no: "02", label: "Skills", dossier: "Capability matrix", page: 3 },
+  { id: "capabilities", no: "02", label: "Skills", dossier: "Evidence board", page: 3 },
   { id: "cases", no: "03", label: "Projects", dossier: "Case files", page: 4 },
   { id: "record", no: "04", label: "Experience", heading: "Experience & education", page: 5 },
   { id: "honours", no: "05", label: "Certifications", heading: "Certifications & awards", page: 6 },
@@ -64,10 +64,10 @@ export const TAPE = [
 ]
 
 export const EXHIBITS = [
-  { id: "A", value: 43, suffix: "", label: "APT groups classified from opcode sequences" },
+  { id: "A", value: 95.1, suffix: "%", label: "Accuracy attributing malware to its APT group" },
   { id: "B", value: 4, suffix: "+", label: "Years shipping software into enterprise production" },
   { id: "C", value: 140, suffix: "+", label: "Automated tests guarding Pico on iOS" },
-  { id: "D", value: 14, suffix: "+", label: "Metadata types stripped by MetaWipe" },
+  { id: "D", value: 43, suffix: "", label: "APT groups in the malware dataset" },
 ]
 
 export const AFFILIATIONS = [
@@ -153,7 +153,7 @@ export const MATRIX: Tactic[] = [
       { name: "Swift · iOS", evidence: [c("pico"), c("metawipe")] },
       { name: "SQL", evidence: [] },
       { name: "Solidity", evidence: [c("ethchat"), c("energy")] },
-      { name: "JavaScript · React", evidence: [c("ethchat"), c("agrimate")] },
+      { name: "JavaScript", evidence: [c("ethchat")] },
       { name: "PowerShell · Bash", evidence: [r("doqpros")] },
     ],
   },
@@ -192,6 +192,8 @@ export type CaseFile = {
   featured?: boolean
   note?: string
   metrics?: { v: string; l: string }[]
+  /** What the case's exhibit shows, labelled honestly: real data or footage vs. an illustration. */
+  exhibit: { kind: "Real data" | "Real footage" | "Simulation" | "Illustration"; caption: string }
 }
 
 export const CASES: CaseFile[] = [
@@ -204,18 +206,26 @@ export const CASES: CaseFile[] = [
     status: "Attributed",
     filters: ["security"],
     featured: true,
-    metrics: [{ v: "43", l: "APT groups" }],
+    metrics: [
+      { v: "95.1%", l: "Accuracy, Random Forest" },
+      { v: "43", l: "APT groups sampled" },
+    ],
+    exhibit: {
+      kind: "Real data",
+      caption: "Random Forest confusion matrix: 293 of 308 held-out samples attributed correctly",
+    },
     abstract:
-      "Static analysis of malware from 43 APT groups. Opcode sequences pulled out with Ghidra train models that attribute a sample to the group behind it.",
+      "Static analysis of malware from 43 APT groups. Opcode sequences pulled out with Ghidra train models that attribute a sample to the group behind it, with 95.1% accuracy on held-out samples.",
     brief:
       "Attribute compiled malware to the threat group that produced it, using static analysis of the binaries.",
     actions: [
       "Disassembled malware samples spanning 43 Advanced Persistent Threat groups in Ghidra",
       "Extracted opcode sequences from the compiled binaries as classification features",
       "Trained machine learning models to attribute each sample to its origin group",
+      "Compared four tuned classifiers: Random Forest led at 95.1% accuracy (F1 0.953), ahead of SVM (94.5%), KNN (94.2%) and a decision tree (93.2%)",
     ],
     outcome:
-      "A static-analysis attribution pipeline that helps threat researchers attribute samples faster.",
+      "95.1% accuracy attributing held-out malware to the APT group behind it, from static analysis alone.",
     stack: ["Ghidra", "Python", "scikit-learn", "Reverse engineering"],
     links: [{ label: "Source on GitHub", href: "https://github.com/HarishSiva05/APT-Malware-Classification" }],
   },
@@ -233,6 +243,10 @@ export const CASES: CaseFile[] = [
       { v: "140+", l: "Automated tests" },
       { v: "11", l: "TestFlight builds" },
     ],
+    exhibit: {
+      kind: "Real footage",
+      caption: "From Pico's ad, cut from the real app recorded in the iOS Simulator",
+    },
     abstract:
       "A privacy-first iPhone budgeting app with iCloud sync, Siri and Apple Pay capture. Designed, tested and shipped end to end, now in App Store review.",
     brief:
@@ -254,6 +268,11 @@ export const CASES: CaseFile[] = [
     year: "2024",
     status: "Prototype",
     filters: ["security"],
+    featured: true,
+    exhibit: {
+      kind: "Simulation",
+      caption: "A reconstruction of what the prototype does. The real demo is on YouTube.",
+    },
     abstract:
       "Detects anomalous repository activity, including unauthorised access and code tampering, and raises real-time alerts with recommended next steps.",
     brief:
@@ -275,6 +294,8 @@ export const CASES: CaseFile[] = [
     year: "2025",
     status: "Built",
     filters: ["security", "engineering"],
+    featured: true,
+    exhibit: { kind: "Illustration", caption: "How MetaWipe strips a photo before it is shared" },
     abstract:
       "A fully offline engine that strips 14+ metadata types, such as GPS and device identifiers, from photos before they're shared.",
     brief: "Stop photos from leaking where and on what device they were taken.",
@@ -294,15 +315,20 @@ export const CASES: CaseFile[] = [
     year: "2023",
     status: "Open Source",
     filters: ["web3", "security"],
+    exhibit: {
+      kind: "Illustration",
+      caption: "Based on the ChatWei contract: registered users, per-user inboxes, messages on-chain",
+    },
     abstract:
-      "Censorship-resistant messaging on Ethereum. Smart contracts hold ciphertext; private keys never leave the device.",
+      "Censorship-resistant messaging on Ethereum: a Solidity contract keeps every user's inbox on-chain, and messages are encrypted before they're sent.",
     brief: "Messaging with no intermediary to trust, subpoena or switch off.",
     actions: [
-      "Developed Solidity smart contracts that store encrypted messages",
-      "Implemented message encryption so private keys never leave the user's device",
+      "Wrote the ChatWei Solidity contract: user registration, per-user inboxes and on-chain messages",
+      "Developed the message encryption for the app",
+      "Built the browser front end with web3.js and MetaMask, so people send from their own wallet",
     ],
     outcome: "A censorship-resistant, Ethereum-based messaging app.",
-    stack: ["Solidity", "React", "Web3.js", "IPFS"],
+    stack: ["Solidity", "Truffle", "web3.js", "MetaMask"],
     links: [{ label: "Source on GitHub", href: "https://github.com/HarishSiva05/Blockchain-Chat" }],
   },
   {
@@ -313,6 +339,7 @@ export const CASES: CaseFile[] = [
     year: "2022",
     status: "Archived",
     filters: ["web3"],
+    exhibit: { kind: "Illustration", caption: "Households trading surplus solar through smart contracts" },
     abstract:
       "A secure transaction framework and automated trading logic letting households trade rooftop solar surplus directly with neighbours.",
     brief: "Cut out the middleman between a household with surplus solar and the one next door.",
@@ -333,24 +360,18 @@ export const CASES: CaseFile[] = [
     status: "Winner",
     filters: ["engineering"],
     abstract:
-      "A mobile finance app improving farmers' financial literacy, with secure payments and expense tracking. Won the Yugam 2020 48-hour hackathon.",
+      "A native Android finance app improving farmers' financial literacy, with secure payments and financial tracking. Won the Yugam 2020 48-hour hackathon.",
     brief: "Give smallholder farmers the financial tools banks never built for them.",
+    exhibit: { kind: "Illustration", caption: "The farmer and investor flows of the Android app" },
     actions: [
       "Built secure backend features for payments and financial tracking",
-      "Designed a mobile-first experience for expense tracking and microloan eligibility",
+      "Built the native Android app: OTP sign-in and separate farmer and investor flows",
     ],
     outcome: "Winner of the Yugam 2020 48-hour hackathon.",
-    stack: ["React Native", "Node.js", "MongoDB"],
+    stack: ["Android", "Java", "AndroidX"],
     links: [{ label: "Source on GitHub", href: "https://github.com/HarishSiva05/Agrimate-YUGAM" }],
   },
 ]
-
-export const CASE_FILTERS = [
-  { id: "all", label: "All files" },
-  { id: "security", label: "Security" },
-  { id: "engineering", label: "Engineering" },
-  { id: "web3", label: "Web3" },
-] as const
 
 // ============ SERVICE RECORD ============
 

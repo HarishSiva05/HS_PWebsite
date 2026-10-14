@@ -8,6 +8,8 @@ import { Matrix } from "@/components/dossier/matrix"
 import { Cases, CaseDrawer } from "@/components/dossier/cases"
 import { Record, Honours } from "@/components/dossier/record"
 import { Contact } from "@/components/dossier/contact"
+import SoundToggle from "@/components/dossier/sound-toggle"
+import Fingerprints from "@/components/dossier/fingerprints"
 
 export default function Home() {
   return (
@@ -27,6 +29,8 @@ export default function Home() {
         <Contact />
       </main>
       <CaseDrawer />
+      <SoundToggle />
+      <Fingerprints />
     </>
   )
 }

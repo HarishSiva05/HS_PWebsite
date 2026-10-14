@@ -2,9 +2,19 @@
 
 import { useEffect } from "react"
 import Lenis from "lenis"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import * as gtag from "@/lib/gtag"
 
+if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger)
+
 let lenis: Lenis | null = null
+
+/** The running Lenis instance, or null (reduced motion, or before mount). */
+export const getLenis = () => lenis
+
+export const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
 const NAV_OFFSET = -72
 
@@ -30,11 +40,17 @@ export function lockScroll(locked: boolean) {
   document.documentElement.style.overflow = locked ? "hidden" : ""
 }
 
+/** Lenis drives the scroll; GSAP's ticker drives Lenis, so ScrollTrigger and Lenis share one clock. */
 export function SmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    lenis = new Lenis({ autoRaf: true, lerp: 0.11, wheelMultiplier: 0.95 })
+    if (prefersReducedMotion()) return
+    lenis = new Lenis({ autoRaf: false, lerp: 0.11, wheelMultiplier: 0.95 })
+    lenis.on("scroll", ScrollTrigger.update)
+    const tick = (time: number) => lenis?.raf(time * 1000)
+    gsap.ticker.add(tick)
+    gsap.ticker.lagSmoothing(0)
     return () => {
+      gsap.ticker.remove(tick)
       lenis?.destroy()
       lenis = null
     }

@@ -1,0 +1,533 @@
+/* ============================================================
+   Finale: sound toggle, fingerprints, stamped seals, secure channel.
+   Loads after app/globals.css and only adds to it or overrides it.
+   ============================================================ */
+
+.fin-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes fin-blink {
+  50% { opacity: 0; }
+}
+
+/* ============ SOUND TOGGLE ============ */
+/* An index tab in the left gutter, under the page rail: never over text or the nav. */
+.snd {
+  position: fixed;
+  left: 9px;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 9px;
+  width: 22px;
+  height: 106px;
+  padding: 0 0 9px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--paper-3) 90%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 12px 24px -16px rgba(48, 36, 12, 0.55);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.3s,
+    background-color 0.35s,
+    border-color 0.35s,
+    box-shadow 0.35s,
+    transform 0.3s var(--ease);
+}
+.snd-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+.snd-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+.snd-eq i {
+  display: block;
+  width: 2px;
+  height: 10px;
+  background: currentColor;
+  transform-origin: 50% 100%;
+  transform: scaleY(0.3);
+  transition: transform 0.4s var(--ease), background-color 0.3s;
+}
+.snd-eq i:nth-child(2) { transform: scaleY(0.5); }
+.snd:hover { color: var(--ink); border-color: var(--ink-3); transform: translateX(2px); }
+.snd:active { transform: translateX(1px) scale(0.97); }
+.snd:focus-visible { outline: 2px solid var(--stamp); outline-offset: 2px; }
+
+.snd.is-on { color: var(--ink); }
+.snd.is-on .snd-eq i { background: var(--stamp); animation: snd-eq 0.86s var(--ease-io) infinite alternate; }
+.snd.is-on .snd-eq i:nth-child(2) { animation-duration: 0.58s; animation-delay: -0.31s; }
+.snd.is-on .snd-eq i:nth-child(3) { animation-duration: 0.74s; animation-delay: -0.52s; }
+@keyframes snd-eq {
+  from { transform: scaleY(0.25); }
+  to { transform: scaleY(1); }
+}
+
+.snd.is-dark {
+  border-color: var(--ops-rule);
+  background: color-mix(in oklab, var(--ops-2) 92%, transparent);
+  box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.9);
+  color: var(--ops-mute);
+}
+.snd.is-dark:hover,
+.snd.is-dark.is-on { color: var(--paper); }
+.snd.is-dark:hover { border-color: var(--ops-mute); }
+.snd.is-dark.is-on .snd-eq i { background: var(--hi); }
+.snd.is-dark:focus-visible { outline-color: var(--hi); }
+
+/* the rail ("File HS-0519 — …") steps up to sit above the tab */
+body:has(.snd) .rail { bottom: 138px; }
+
+@media (max-width: 1279px) {
+  .snd { left: max(4px, calc((var(--gutter) - 22px) / 2)); }
+}
+@media (max-width: 719px) {
+  /* phones: a slim tab flush to the screen edge, inside the 16px gutter with room to spare */
+  .snd {
+    left: env(safe-area-inset-left, 0px);
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    width: 13px;
+    height: 92px;
+    gap: 7px;
+    padding-bottom: 7px;
+    border-left: 0;
+    border-radius: 0 3px 3px 0;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .snd-eq { gap: 1.5px; height: 8px; }
+  .snd-eq i { width: 1.5px; height: 8px; }
+  .snd:hover { transform: none; }
+}
+
+/* ============ FINGERPRINTS ============ */
+.fp-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 30;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.fp {
+  position: absolute;
+  width: 44px;
+  max-width: none; /* the global svg max-width: 100% would collapse it inside the 0-wide layer */
+  height: 56px;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask-image: var(--grunge);
+  mask-image: var(--grunge);
+  -webkit-mask-size: 64px;
+  mask-size: 64px;
+  -webkit-mask-position: var(--fp-grain, 0 0);
+  mask-position: var(--fp-grain, 0 0);
+  will-change: transform, opacity;
+}
+.fp-ink { color: var(--ink); }
+.fp-red { color: var(--stamp); }
+
+@media print {
+  .snd,
+  .fp-layer { display: none !important; }
+}
+
+/* ============ CERTIFICATIONS: STAMPED SEALS ============ */
+/* The stage never transforms, so the press can multiply its ink straight onto the paper. */
+.seal-stage {
+  position: relative;
+  display: block;
+  width: min(210px, 100%);
+  aspect-ratio: 1;
+  margin-bottom: 8px;
+}
+.seal-stage .seal {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  mix-blend-mode: normal;
+}
+.seal-press {
+  position: absolute;
+  inset: 0;
+  display: block;
+  mix-blend-mode: multiply;
+}
+.seal-shadow {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(40, 30, 12, 0.42), rgba(40, 30, 12, 0.14) 64%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+.seal-burst {
+  position: absolute;
+  inset: 1.5%;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.seal-item-ink .seal-burst { color: var(--ink); }
+.seal-item-red .seal-burst { color: var(--stamp); }
+.seal-cap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.seal-item.is-pending .seal-press,
+.seal-item.is-pending .seal-cap { opacity: 0; }
+
+/* ============ CONTACT: SECURE CHANNEL ============ */
+/* The last page clips its own overflow: the End-of-file stamp springs in from scale 1.7, which
+   would otherwise stretch the document for a moment and let you scroll onto bare paper. */
+.contact { overflow: clip; }
+.contact :focus-visible { outline-color: var(--hi); }
+
+.contact-caret {
+  display: inline-block;
+  width: 0.36em;
+  height: 0.7em;
+  margin-left: 0.1em;
+  background: currentColor;
+  animation: fin-blink 1.06s steps(1) infinite;
+}
+
+.cx-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: clamp(36px, 4.5vw, 80px);
+  align-items: start;
+  margin-top: clamp(44px, 5vw, 72px);
+}
+
+/* ---- the terminal ---- */
+.chan {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--ops-rule);
+  background: linear-gradient(180deg, #171715, #111110 55%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 60px 100px -60px rgba(0, 0, 0, 0.95);
+  color: #d8d3c6;
+  font-family: var(--mono);
+}
+/* scan lines and a faint phosphor glow from the top */
+.chan::before,
+.chan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.chan::before { background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px); }
+.chan::after { background: radial-gradient(120% 70% at 50% 0%, rgba(200, 255, 61, 0.055), transparent 62%); }
+
+.chan-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--ops-rule);
+  background: rgba(255, 255, 255, 0.018);
+}
+.chan-lock { flex: none; width: 10px; height: 12px; color: var(--hi); }
+.chan .chan-title { color: var(--paper); }
+.chan-bar-rule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--ops-rule) 0 4px, transparent 4px 8px);
+}
+.chan-state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.chan-state i { width: 7px; height: 7px; border-radius: 50%; background: var(--ops-mute); transition: background 0.3s, box-shadow 0.3s; }
+.chan.is-live .chan-state { color: #e6bd4c; }
+.chan.is-live .chan-state i { background: #e6bd4c; animation: fin-blink 0.5s steps(1) infinite; }
+.chan.is-open .chan-state { color: var(--hi); }
+.chan.is-open .chan-state i { background: var(--hi); box-shadow: 0 0 10px rgba(200, 255, 61, 0.8); }
+
+.chan-screen { position: relative; }
+.chan-log {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  padding: 20px 22px 4px;
+  font-size: 15px;
+  line-height: 1.75;
+  text-shadow: 0 0 12px rgba(200, 255, 61, 0.07);
+}
+.chan-lines { flex: 1; min-width: 0; }
+
+/* the session key's randomart, drawn by the bishop's walk */
+.chan-art {
+  flex: none;
+  margin: 3px 0 0;
+  color: rgba(200, 255, 61, 0.5);
+  font: 400 11px/1.1 var(--mono);
+  letter-spacing: 0.02em;
+  white-space: pre;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.chan-art.is-on { opacity: 1; transform: none; }
+.chan-art b { font-weight: 600; color: var(--paper); }
+.chan-art b.is-bishop { color: var(--hi); text-shadow: 0 0 8px rgba(200, 255, 61, 0.85); }
+/* power-on: a thin phosphor line widens, then blooms into the screen */
+.chan-log::before {
+  content: "";
+  position: absolute;
+  inset: 6px 0;
+  background: linear-gradient(rgba(200, 255, 61, 0), rgba(200, 255, 61, 0.24) 50%, rgba(200, 255, 61, 0));
+  opacity: 0;
+  pointer-events: none;
+}
+.chan.is-booting .chan-log::before { animation: chan-on 0.52s var(--ease) both; }
+@keyframes chan-on {
+  0% { opacity: 1; transform: scale(0.18, 0.025); }
+  42% { opacity: 1; transform: scale(1, 0.025); }
+  100% { opacity: 0; transform: scale(1, 1); }
+}
+.chan-line {
+  position: relative;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.chan-ghost { visibility: hidden; }
+.chan-live { position: absolute; inset: 0; }
+.chan-cmd { color: var(--paper); }
+.chan-res { color: var(--ops-mute); }
+.chan-p { color: var(--hi); }
+.chan-dim { color: #77715f; }
+.chan-ok { color: #93dd72; }
+.chan-spin { color: var(--hi); }
+.chan-open { color: var(--hi); text-shadow: 0 0 14px rgba(200, 255, 61, 0.32); }
+.chan-sent { margin-top: 6px; color: var(--paper); }
+.chan-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.12em;
+  margin-left: 1px;
+  vertical-align: -0.2em;
+  background: var(--hi);
+  animation: fin-blink 1.06s steps(1) infinite;
+}
+
+/* ---- composer ---- */
+.chan-form { padding: 4px 22px 22px; }
+.chan .chan-label { display: block; margin: 16px 0 10px; color: var(--ops-mute); cursor: text; }
+.chan-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ops-rule);
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.chan-field:hover { border-color: #4b4840; }
+.chan-field:focus-within {
+  border-color: var(--hi);
+  background: rgba(200, 255, 61, 0.03);
+  box-shadow: 0 0 0 3px rgba(200, 255, 61, 0.16);
+}
+.chan-prompt { color: var(--hi); font-size: 15px; line-height: 1.6; }
+.chan-field textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 104px;
+  max-height: 280px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  resize: none;
+  field-sizing: content;
+  background: transparent;
+  color: var(--paper);
+  caret-color: var(--hi);
+  font: 400 15px/1.6 var(--mono);
+}
+.chan-field textarea:focus-visible { outline: none; }
+.chan-field textarea::placeholder { color: var(--ops-mute); opacity: 1; }
+
+.chan-cipher {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--ops-rule);
+}
+.chan-cipher-out {
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+  white-space: nowrap;
+  color: rgba(200, 255, 61, 0.6);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%);
+  mask-image: linear-gradient(90deg, transparent, #000 20%);
+}
+.chan-cipher-out b { font-weight: 500; color: var(--hi); animation: chan-byte 0.6s ease-out; }
+@keyframes chan-byte {
+  from { color: #fff; text-shadow: 0 0 10px var(--hi); }
+}
+.chan-cipher-idle { color: var(--ops-mute); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.chan .chan-bytes { min-width: 4ch; text-align: right; }
+
+.chan-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  margin-top: 18px;
+}
+.chan-note { margin: 0; font: 400 12px/1.45 var(--mono); color: var(--ops-mute); }
+.chan-actions { display: inline-flex; align-items: center; gap: 16px; }
+.chan .chan-hint { font-size: 10px; }
+.chan-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px 12px;
+  background: var(--hi);
+  color: var(--ink);
+  font: 700 15px/1 var(--sans);
+  box-shadow: 4px 4px 0 rgba(200, 255, 61, 0.22);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.chan-send span { transition: transform 0.25s var(--ease); }
+.chan-send:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 rgba(200, 255, 61, 0.26); }
+.chan-send:hover span { transform: translateX(4px); }
+.chan-send:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 rgba(200, 255, 61, 0.3); }
+.chan-send:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+
+/* ---- details ---- */
+.cx-side { position: relative; }
+.cx-details { margin: 0; border-top: 1px solid var(--ops-rule); }
+
+/* handwritten invitations, in highlighter on the dark page */
+.contact .pen { color: var(--hi); }
+.cx-pen { left: -14px; top: calc(100% + 34px); }
+.cx-main { position: relative; }
+.cx-pen-sm { display: none; }
+.cx-row {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  gap: 8px 20px;
+  padding: 19px 0 20px;
+  border-bottom: 1px solid var(--ops-rule);
+}
+.cx-row dt { padding-top: 4px; }
+.cx-row dd {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  color: var(--paper);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.cx-row dd.cx-links { flex-direction: row; flex-wrap: wrap; gap: 8px 22px; }
+.cx-links a {
+  width: fit-content;
+  border-bottom: 1px solid var(--ops-rule);
+  transition: color 0.2s, border-color 0.2s;
+}
+.cx-links a:hover { color: var(--hi); border-color: var(--hi); }
+.cx-coords { font-size: 10.5px; }
+.cx-v .pulse { margin-right: 9px; }
+
+/* ---- end of file: the barcode gets scanned ---- */
+.eof-code { position: relative; display: block; width: 190px; overflow: hidden; }
+.eof-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 40px;
+  background: var(--hi);
+  box-shadow: 0 0 12px 2px rgba(200, 255, 61, 0.65);
+  opacity: 0;
+  pointer-events: none;
+}
+.eof.is-scanned .eof-scan { animation: eof-scan 1.15s var(--ease-io) 0.1s both; }
+@keyframes eof-scan {
+  0% { opacity: 0; transform: translateX(0); }
+  12%, 88% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(188px); }
+}
+
+@media (max-width: 1099px) {
+  .cx-main { grid-template-columns: minmax(0, 1fr); }
+  .cx-details { display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; }
+  .cx-pen { display: none; }
+  .cx-pen-sm { display: inline-flex; right: 4%; top: -46px; }
+}
+@media (max-width: 719px) {
+  .chan-bar { padding: 10px 14px; gap: 8px; }
+  .chan-log { padding: 16px 14px 2px; font-size: 12.5px; line-height: 1.7; }
+  .chan-art { display: none; }
+  .chan-form { padding: 0 14px 16px; }
+  .chan-field { padding: 11px 12px; gap: 10px; }
+  .chan .chan-hint { display: none; }
+  .chan-foot { flex-direction: column; align-items: stretch; }
+  .chan-actions { display: flex; }
+  .chan-send { flex: 1; justify-content: center; padding-block: 15px 14px; }
+  .cx-details { grid-template-columns: minmax(0, 1fr); }
+  .cx-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 16px 0 17px; }
+}
+/* iOS zooms into fields under 16px */
+@media (max-width: 719px), (pointer: coarse) {
+  .chan-field textarea { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snd.is-on .snd-eq i { animation: none; transform: scaleY(0.6); }
+  .snd.is-on .snd-eq i:nth-child(2) { transform: scaleY(1); }
+  .snd.is-on .snd-eq i:nth-child(3) { transform: scaleY(0.75); }
+  .contact-caret,
+  .chan-caret,
+  .chan.is-live .chan-state i { animation: none; }
+  .eof.is-scanned .eof-scan { animation: none; }
+}
