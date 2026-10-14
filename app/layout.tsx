@@ -18,13 +18,18 @@ export const metadata: Metadata = {
   title: "Harish Sivaram — Cybersecurity & Software Engineer",
   description,
   openGraph: {
-    title: "Harish Sivaram — File HS-0519, declassified",
+    title: "Harish Sivaram — Cybersecurity & Software Engineer",
     description,
     url: SUBJECT.site,
     type: "profile",
     images: [{ url: "/subject.jpg", width: 1000, height: 1000, alt: "Harish Sivaram" }],
   },
-  twitter: { card: "summary_large_image", title: "Harish Sivaram — File HS-0519", description, images: ["/subject.jpg"] },
+  twitter: {
+    card: "summary_large_image",
+    title: "Harish Sivaram — Cybersecurity & Software Engineer",
+    description,
+    images: ["/subject.jpg"],
+  },
 }
 
 export const viewport: Viewport = { themeColor: "#ede9df" }

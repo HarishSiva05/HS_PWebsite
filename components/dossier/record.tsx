@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import { motion, useScroll, useSpring } from "framer-motion"
 import { Redact, Reveal, SectionHead, Stamp } from "./primitives"
-import { AWARDS, CERTIFICATIONS, EDUCATION, EXPERIENCE, TRAINING } from "@/lib/dossier"
+import { AWARDS, CERTIFICATIONS, EDUCATION, EXPERIENCE, TRAINING, sectionName } from "@/lib/dossier"
 
 export function Record() {
   const line = useRef<HTMLOListElement>(null)
@@ -11,20 +11,18 @@ export function Record() {
   const draw = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
 
   return (
-    <section id="record" className="page record-sec" aria-label="Service record">
+    <section id="record" className="page record-sec" aria-label={sectionName("record")}>
       <SectionHead
-        no="04"
-        label="Service record"
-        page={5}
+        id="record"
         title={
           <>
-            Service{" "}
+            Experience,{" "}
             <Redact block delay={80}>
-              record.
+              on record.
             </Redact>
           </>
         }
-        kicker="Employment, ongoing operations and education, most recent first."
+        kicker="Employment, security training and education, most recent first."
       />
 
       <div className="record-grid">
@@ -56,7 +54,7 @@ export function Record() {
         </ol>
 
         <div className="record-label">
-          <span className="mono">B / Active operations</span>
+          <span className="mono">B / Security training &amp; labs</span>
         </div>
         <div className="ops-grid">
           {TRAINING.map((t, i) => (
@@ -131,11 +129,9 @@ const SEAL_TONES = ["ink", "red", "ink", "red"]
 
 export function Honours() {
   return (
-    <section id="honours" className="page honours-sec" aria-label="Commendations">
+    <section id="honours" className="page honours-sec" aria-label={sectionName("honours")}>
       <SectionHead
-        no="05"
-        label="Commendations"
-        page={6}
+        id="honours"
         title={
           <>
             Certified &amp;{" "}

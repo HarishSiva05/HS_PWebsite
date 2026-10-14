@@ -28,9 +28,7 @@ export function Contact() {
   return (
     <section id="contact" className="page ops contact" aria-label="Contact">
       <SectionHead
-        no="06"
-        label="Secure channel"
-        page={7}
+        id="contact"
         tone="ops"
         title={
           <>
@@ -110,7 +108,7 @@ export function Contact() {
           End of file
         </Stamp>
         <button className="mono eof-top" onClick={() => jump("cover")}>
-          Back to cover ↑
+          Back to top ↑
         </button>
       </footer>
     </section>

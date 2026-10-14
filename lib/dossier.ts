@@ -13,17 +13,37 @@ export const SUBJECT = {
   site: "https://harishsivaram.netlify.app",
 }
 
-export const SECTIONS = [
-  { id: "cover", no: "00", label: "Cover", page: 1 },
+export type Section = {
+  id: string
+  no: string
+  /** The plain word a recruiter scans for. Used in the nav, menu and rail. */
+  label: string
+  /** Fuller plain label for the section's header row, when the nav word undersells it. */
+  heading?: string
+  /** The in-world dossier name, kept as secondary flavour. */
+  dossier?: string
+  page: number
+}
+
+export const SECTIONS: Section[] = [
+  { id: "cover", no: "00", label: "Home", page: 1 },
   { id: "summary", no: "01", label: "Summary", page: 2 },
-  { id: "capabilities", no: "02", label: "Capabilities", page: 3 },
-  { id: "cases", no: "03", label: "Case Files", page: 4 },
-  { id: "record", no: "04", label: "Service Record", page: 5 },
-  { id: "honours", no: "05", label: "Commendations", page: 6 },
+  { id: "capabilities", no: "02", label: "Skills", dossier: "Capability matrix", page: 3 },
+  { id: "cases", no: "03", label: "Projects", dossier: "Case files", page: 4 },
+  { id: "record", no: "04", label: "Experience", heading: "Experience & education", page: 5 },
+  { id: "honours", no: "05", label: "Certifications", heading: "Certifications & awards", page: 6 },
   { id: "contact", no: "06", label: "Contact", page: 7 },
-] as const
+]
 
 export const PAGE_COUNT = SECTIONS.length
+
+export const sectionById = (id: string) => SECTIONS.find((s) => s.id === id) ?? SECTIONS[0]
+
+/** Full plain name of a section, for its header row and landmark label. */
+export const sectionName = (id: string) => {
+  const s = sectionById(id)
+  return s.heading ?? s.label
+}
 
 export const FIELDS = [
   { k: "Role", v: "Cybersecurity & Software Engineer" },
@@ -455,6 +475,9 @@ export function evidenceLabel(ref: EvidenceRef): { tag: string; title: string } 
     return { tag: `Case ${k?.no ?? "??"}`, title: k?.title ?? ref.id }
   }
   if (ref.id === "certs") return { tag: "Certified", title: "Rapid Incident Response with Cisco XDR" }
-  const e = [...EXPERIENCE, ...TRAINING].find((x) => x.id === ref.id)
-  return { tag: "Record", title: e ? `${e.role}, ${e.org}` : ref.id }
+  const job = EXPERIENCE.find((x) => x.id === ref.id)
+  if (job) return { tag: "Work", title: `${job.role}, ${job.org}` }
+  // a course or lab is training, never dressed up as a job
+  const t = TRAINING.find((x) => x.id === ref.id)
+  return { tag: "Training", title: t ? `${t.role}, ${t.org}` : ref.id }
 }

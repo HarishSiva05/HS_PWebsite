@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { dossier, useDossier } from "./store"
-import { PAGE_COUNT } from "@/lib/dossier"
+import { PAGE_COUNT, sectionById } from "@/lib/dossier"
 
 const EASE = [0.2, 0.7, 0.2, 1] as const
 
@@ -276,28 +276,26 @@ export function Reveal({
 // ============ SECTION HEAD ============
 
 export function SectionHead({
-  no,
-  label,
-  page,
+  id,
   title,
   kicker,
   tone = "paper",
 }: {
-  no: string
-  label: string
-  page: number
+  id: string
   title: React.ReactNode
   kicker?: React.ReactNode
   tone?: "paper" | "ops"
 }) {
+  const s = sectionById(id)
   return (
     <header className={`sec-head sec-head-${tone}`}>
       <div className="sec-rule">
-        <span className="mono">§ {no}</span>
-        <span className="mono sec-label">{label}</span>
+        <span className="mono">§ {s.no}</span>
+        <span className="mono sec-label">{s.heading ?? s.label}</span>
+        {s.dossier && <span className="mono sec-dossier hide-sm">/ {s.dossier}</span>}
         <span className="sec-rule-line" />
-        <span className="mono">
-          Page {String(page).padStart(2, "0")} / {String(PAGE_COUNT).padStart(2, "0")}
+        <span className="mono hide-sm">
+          Page {String(s.page).padStart(2, "0")} / {String(PAGE_COUNT).padStart(2, "0")}
         </span>
       </div>
       <h2 className="sec-title">{title}</h2>

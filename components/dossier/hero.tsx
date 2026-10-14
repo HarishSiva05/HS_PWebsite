@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { useDossier } from "./store"
 import { jump } from "./smooth-scroll"
 import { PenNote, Redact, Stamp } from "./primitives"
-import { FIELDS, PAGE_COUNT, SUBJECT, TAPE } from "@/lib/dossier"
+import { FIELDS, PAGE_COUNT, SUBJECT, TAPE, sectionName } from "@/lib/dossier"
 import * as gtag from "@/lib/gtag"
 
 function useClock() {
@@ -56,7 +56,7 @@ export function Hero() {
   }, [])
 
   return (
-    <section id="cover" ref={root} className="cover page" aria-label="Cover">
+    <section id="cover" ref={root} className="cover page" aria-label={sectionName("cover")}>
       <div className="doc-strip mono">
         <span>
           <span className="hide-sm">File no. </span>
@@ -122,7 +122,7 @@ export function Hero() {
 
           <div className="cover-cta">
             <button className="btn btn-ink" onClick={() => jump("cases")} data-cursor="Open">
-              Open the case files <span aria-hidden="true">→</span>
+              View projects <span aria-hidden="true">→</span>
             </button>
             <a
               className="btn btn-line"

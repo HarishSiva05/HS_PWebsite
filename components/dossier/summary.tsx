@@ -1,15 +1,13 @@
 "use client"
 
 import { PenNote, Redact, Reveal, Scramble, SectionHead } from "./primitives"
-import { AFFILIATIONS, EXHIBITS, FIELD_NOTES } from "@/lib/dossier"
+import { AFFILIATIONS, EXHIBITS, FIELD_NOTES, sectionName } from "@/lib/dossier"
 
 export function Summary() {
   return (
-    <section id="summary" className="page summary" aria-label="Analyst summary">
+    <section id="summary" className="page summary" aria-label={sectionName("summary")}>
       <SectionHead
-        no="01"
-        label="Analyst summary"
-        page={2}
+        id="summary"
         title={
           <>
             Reads{" "}

@@ -4,27 +4,64 @@ import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useDossier } from "./store"
 import { jump, lockScroll } from "./smooth-scroll"
-import { SECTIONS, SUBJECT, PAGE_COUNT } from "@/lib/dossier"
+import { Stamp } from "./primitives"
+import { SECTIONS, SUBJECT, PAGE_COUNT, type Section } from "@/lib/dossier"
 import * as gtag from "@/lib/gtag"
 
 const pad = (n: number) => String(n).padStart(2, "0")
 
-function Meter() {
+// Menu caption under each label: the dossier name, or the rest of the fuller heading
+// ("Experience" + "& education") so the line never repeats the word above it.
+const caption = (s: Section) =>
+  s.dossier ?? (s.heading?.startsWith(s.label) ? s.heading.slice(s.label.length).trim() : s.heading)
+
+function useProgress() {
   const total = useDossier((s) => s.total)
   const opened = useDossier((s) => s.opened)
-  const complete = total > 0 && opened >= total
+  return { ratio: total ? opened / total : 0, complete: total > 0 && opened >= total }
+}
+
+// Reading progress = redactions lifted. A thin line under the bar, because a labelled
+// counter next to the résumé button read to recruiters as a stat or a loading widget.
+function ProgressLine() {
+  const { ratio, complete } = useProgress()
   return (
-    <div className={`meter ${complete ? "is-complete" : ""}`} title="Redactions lifted as you read">
-      <span className="mono meter-label">{complete ? "Fully declassified ✓" : "Declassified"}</span>
-      {!complete && (
-        <span className="mono meter-count">
-          {pad(opened)}/{pad(total)}
-        </span>
+    <span className={`nav-progress ${complete ? "is-complete" : ""}`} aria-hidden="true">
+      <span className="nav-progress-fill" style={{ transform: `scaleX(${ratio})` }} />
+    </span>
+  )
+}
+
+// One-off payoff once every redaction is lifted. Rendered outside the header: the bar's
+// backdrop-filter would otherwise make it the containing block for this fixed element.
+function DeclassifiedStamp() {
+  const { complete } = useProgress()
+  const [stamp, setStamp] = useState(false)
+
+  useEffect(() => {
+    if (!complete) return
+    setStamp(true)
+    const t = setTimeout(() => setStamp(false), 2800)
+    return () => clearTimeout(t)
+  }, [complete])
+
+  return (
+    <AnimatePresence>
+      {stamp && (
+        <motion.div
+          className="declass-toast"
+          aria-hidden="true"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 12 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Stamp tone="red" rotate={-7} play delay={0.1}>
+            Fully declassified
+          </Stamp>
+        </motion.div>
       )}
-      <span className="meter-track">
-        <span className="meter-fill" style={{ transform: `scaleX(${total ? opened / total : 0})` }} />
-      </span>
-    </div>
+    </AnimatePresence>
   )
 }
 
@@ -76,7 +113,6 @@ export function Nav() {
           <span className="brand-glyph">HS</span>
           <span className="nav-brand-text">
             <strong>Harish Sivaram</strong>
-            <span className="mono">File {SUBJECT.fileNo}</span>
           </span>
         </button>
 
@@ -87,15 +123,18 @@ export function Nav() {
               onClick={() => go(s.id)}
               className={`nav-link ${active === s.id ? "is-active" : ""}`}
               aria-current={active === s.id ? "true" : undefined}
+              title={s.heading}
             >
               <span className="mono">{s.no}</span>
-              {s.label}
+              <span>
+                {s.label}
+                {s.heading && <span className="nav-more"> {caption(s)}</span>}
+              </span>
             </button>
           ))}
         </nav>
 
         <div className="nav-right">
-          <Meter />
           <a
             className="nav-cv"
             href={SUBJECT.resume}
@@ -106,10 +145,12 @@ export function Nav() {
             Résumé <span aria-hidden="true">↓</span>
           </a>
           <button className="nav-menu" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="toc">
-            Index
+            Menu
           </button>
         </div>
+        <ProgressLine />
       </header>
+      <DeclassifiedStamp />
 
       <div className="rail" aria-hidden="true">
         <span className="mono">
@@ -124,14 +165,14 @@ export function Nav() {
             className="toc"
             role="dialog"
             aria-modal="true"
-            aria-label="Table of contents"
+            aria-label="Menu"
             initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
             exit={{ clipPath: "inset(0% 0% 100% 0%)" }}
             transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
           >
             <div className="toc-head">
-              <span className="mono">Table of contents · {SUBJECT.fileNo}</span>
+              <span className="mono">Menu</span>
               <button className="mono toc-close" onClick={() => setOpen(false)} autoFocus>
                 Close ✕
               </button>
@@ -145,18 +186,23 @@ export function Nav() {
                   transition={{ delay: 0.15 + i * 0.04, duration: 0.5 }}
                 >
                   <button onClick={() => go(s.id)} className={active === s.id ? "is-active" : ""}>
-                    <span className="mono">§ {s.no}</span>
-                    <span className="toc-name">{s.label}</span>
-                    <span className="toc-leader" />
-                    <span className="mono">p. {pad(s.page)}</span>
+                    <span className="mono">{s.no}</span>
+                    <span className="toc-name">
+                      {s.label}
+                      {caption(s) && <small className="mono">{caption(s)}</small>}
+                    </span>
                   </button>
                 </motion.li>
               ))}
             </ol>
             <div className="toc-foot">
-              <Meter />
-              <a className="mono" href={SUBJECT.resume} download>
-                Download résumé (PDF) ↓
+              <a
+                className="toc-cv"
+                href={SUBJECT.resume}
+                download
+                onClick={() => gtag.event({ action: "resume_download", category: "engagement", label: "Menu" })}
+              >
+                Download résumé (PDF) <span aria-hidden="true">↓</span>
               </a>
             </div>
           </motion.div>

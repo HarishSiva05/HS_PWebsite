@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { dossier, useDossier } from "./store"
 import { lockScroll } from "./smooth-scroll"
 import { PenNote, Redact, Reveal, SectionHead, Stamp } from "./primitives"
-import { CASES, CASE_FILTERS, type CaseFile } from "@/lib/dossier"
+import { CASES, CASE_FILTERS, sectionName, type CaseFile } from "@/lib/dossier"
 import * as gtag from "@/lib/gtag"
 
 type Filter = (typeof CASE_FILTERS)[number]["id"]
@@ -76,11 +76,9 @@ export function Cases() {
   const shown = rest.filter((c) => matches(c, filter))
 
   return (
-    <section id="cases" className="page cases-sec" aria-label="Case files">
+    <section id="cases" className="page cases-sec" aria-label={sectionName("cases")}>
       <SectionHead
-        no="03"
-        label="Case files"
-        page={4}
+        id="cases"
         title={
           <>
             Seven files.{" "}
@@ -92,7 +90,7 @@ export function Cases() {
         kicker="From APT attribution to an iPhone app in App Store review. Open any file for the brief, the method and the evidence."
       />
 
-      <div className="filters" role="toolbar" aria-label="Filter case files">
+      <div className="filters" role="toolbar" aria-label="Filter projects">
         {CASE_FILTERS.map((f) => {
           const n = CASES.filter((c) => matches(c, f.id)).length
           return (
@@ -332,7 +330,7 @@ export function CaseDrawer() {
               </motion.div>
             </AnimatePresence>
 
-            <nav className="drawer-nav" aria-label="Other case files">
+            <nav className="drawer-nav" aria-label="Other projects">
               <button onClick={() => dossier.openCase(prev.id)}>
                 <span className="mono">← Case {prev.no}</span>
                 {prev.title}

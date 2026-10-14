@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { dossier } from "./store"
 import { jump } from "./smooth-scroll"
 import { Redact, SectionHead } from "./primitives"
-import { MATRIX, evidenceLabel, type EvidenceRef } from "@/lib/dossier"
+import { MATRIX, evidenceLabel, sectionName, type EvidenceRef } from "@/lib/dossier"
 
 const key = (e: EvidenceRef) => `${e.kind}:${e.id}`
 const tid = (t: number, i: number) => `T${String(t + 1).padStart(2, "0")}.${String(i + 1).padStart(2, "0")}`
@@ -34,11 +34,9 @@ export function Matrix() {
   const totalTechniques = MATRIX.reduce((n, t) => n + t.techniques.length, 0)
 
   return (
-    <section id="capabilities" className="page matrix-sec" aria-label="Capability matrix">
+    <section id="capabilities" className="page matrix-sec" aria-label={sectionName("capabilities")}>
       <SectionHead
-        no="02"
-        label="Capability matrix"
-        page={3}
+        id="capabilities"
         title={
           <>
             Capabilities,{" "}
@@ -49,20 +47,20 @@ export function Matrix() {
         }
         kicker={
           <>
-            Laid out like a MITRE ATT&amp;CK matrix: {MATRIX.length} tactics, {totalTechniques} techniques. Hover or tap
-            any technique to pull the case file or record entry that backs it up.
+            Laid out like a MITRE ATT&amp;CK matrix: {MATRIX.length} skill areas, {totalTechniques} skills. Hover or tap
+            any skill to see the project, job, training or certification that backs it up.
           </>
         }
       />
 
       <div className="matrix-wrap" data-lenis-prevent-horizontal>
-        <div className="matrix" role="group" aria-label="Techniques by tactic">
+        <div className="matrix" role="group" aria-label="Skills by area">
           {MATRIX.map((tac, t) => (
             <div className="tactic" key={tac.id}>
               <div className="tactic-head">
                 <span className="mono">{tac.id}</span>
                 <h3>{tac.name}</h3>
-                <span className="mono tactic-count">{tac.techniques.length} techniques</span>
+                <span className="mono tactic-count">{tac.techniques.length} skills</span>
               </div>
               <ul>
                 {tac.techniques.map((tech, i) => {
@@ -113,7 +111,7 @@ export function Matrix() {
           >
             {!current || !active ? (
               <p className="evidence-empty">
-                <span className="blink-caret" /> Select a technique to pull its evidence.
+                <span className="blink-caret" /> Select a skill to see its evidence.
               </p>
             ) : (
               <>
@@ -147,7 +145,7 @@ export function Matrix() {
             <i className="ev-case" /> Case file
           </span>
           <span>
-            <i className="ev-rec" /> Record
+            <i className="ev-rec" /> Work / training
           </span>
         </div>
       </div>
