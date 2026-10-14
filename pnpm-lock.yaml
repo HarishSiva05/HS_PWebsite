@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@emotion/is-prop-valid':
-        specifier: latest
+        specifier: 1.4.0
         version: 1.4.0
       '@gsap/react':
         specifier: ^2.1.2
@@ -120,7 +120,7 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(react@19.2.5)
       framer-motion:
-        specifier: latest
+        specifier: 12.38.0
         version: 12.38.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       gsap:
         specifier: ^3.15.0
